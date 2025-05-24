@@ -23,20 +23,22 @@ const weatherJPMap: Record<string, string> = {
 async function shouldBringUmbrella(): Promise<string> {
   const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city},jp&appid=${weatherApiKey}&units=metric&lang=ja`;
   const res = await axios.get(url);
-  console.log(JSON.stringify(res.data, null, 2));
   const list = res.data.list;
 
   // 現在時刻を JST に
   const nowJST = DateTime.now().setZone('Asia/Tokyo');
+  console.log(nowJST);
   const today = nowJST.toISODate(); // 例: "2025-05-24"
+  console.log(today);
 
   const rainHours: string[] = [];
 
   for (const entry of list) {
     // entry.dt_txt は UTC なので、JST に変換する
     const entryTimeJST = DateTime.fromISO(entry.dt_txt, { zone: 'utc' }).setZone('Asia/Tokyo');
+    console.log(entryTimeJST);
     const entryDate = entryTimeJST.toISODate(); // JSTベースの日付
-
+    console.log(entryDate);
     if (entryDate !== today) continue;
 
     const main = entry.weather[0].main;
