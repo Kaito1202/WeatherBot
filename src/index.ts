@@ -14,16 +14,29 @@ const userId = process.env.USER_ID!;
 const city = process.env.CITY!;
 const weatherApiKey = process.env.OPENWEATHER_API_KEY!;
 
-async function getWeather(): Promise<string> {
+async function shouldBringUmbrella(): Promise<string> {
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${weatherApiKey}&units=metric&lang=ja`;
   const res = await axios.get(url);
   const data = res.data;
-  return `【${data.name}の天気】\n${data.weather[0].description}\n気温: ${data.main.temp}°C`;
+  const now = new Date();
+  const today = now.toISOString().slice(0,10)
+
+  const todayForcases = list.filter((entry:any)=>{
+    return entry.dt_txt.startsWith(today);
+  });
+  
+  const willRain = todayForcases.some((entry:any)=>{
+    entry.weather[0].main === "Rain"
+  });
+
+  return willRain
+    ? "☂️ 今日のどこかで雨の予報があります。傘を持って行こう！"
+    : "☀️ 今日の予報では雨はなさそうです。傘はいりません！";
 }
 
 async function notifyWeather() {
   try {
-    const message = await getWeather();
+    const message = await shouldBringUmbrella();
     await lineClient.pushMessage(userId, {
       type: 'text',
       text: message,
