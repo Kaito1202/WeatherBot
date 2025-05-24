@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import axios from 'axios';
 import { Client } from '@line/bot-sdk';
 import cron from 'node-cron';
+import { DateTime } from 'luxon'; 
 
 dotenv.config();
 
@@ -23,24 +24,32 @@ async function shouldBringUmbrella(): Promise<string> {
   const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city},jp&appid=${weatherApiKey}&units=metric&lang=ja`;
   const res = await axios.get(url);
   const list = res.data.list;
-  const now = new Date();
-  const today = now.toISOString().slice(0,10)
-  const rainHours: string[]=[];
 
-  for(const entry of list){
-    if(!entry.dt_txt.startsWith(today)) continue;
+  // 現在時刻を JST に
+  const nowJST = DateTime.now().setZone('Asia/Tokyo');
+  const today = nowJST.toISODate(); // 例: "2025-05-24"
+
+  const rainHours: string[] = [];
+
+  for (const entry of list) {
+    // entry.dt_txt は UTC なので、JST に変換する
+    const entryTimeJST = DateTime.fromISO(entry.dt_txt, { zone: 'utc' }).setZone('Asia/Tokyo');
+    const entryDate = entryTimeJST.toISODate(); // JSTベースの日付
+
+    if (entryDate !== today) continue;
+
     const main = entry.weather[0].main;
-    if(["Rain","Drizzle","Thunderstorm"].includes(main)){
-        const hour = new Date(entry.dt_txt).getHours();
-        const jpMain = weatherJPMap[main] || main;
-        rainHours.push(`${hour}時(${jpMain})`);
-        }
+    if (["Rain", "Drizzle", "Thunderstorm"].includes(main)) {
+      const hour = entryTimeJST.hour;
+      const jpMain = weatherJPMap[main] || main;
+      rainHours.push(`${hour}時（${jpMain}）`);
+    }
   }
 
-
-  if(rainHours.length===0){
+  if (rainHours.length === 0) {
     return "☀️ 今日の予報では雨はなさそうです。傘はいりません！";
   }
+
   return `☂️ 今日の降水予報があります。\n${rainHours.join("、")} に雨の可能性があります。\n傘を持って行きましょう。`;
 }
 
