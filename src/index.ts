@@ -34,7 +34,7 @@ async function shouldBringUmbrella(): Promise<string> {
   const rainHours: string[] = [];
 
   for (const entry of list) {
-    // entry.dt_txt は UTC なので、JST に変換するよ
+    // entry.dt_txt は UTC なので、JST に変換する
     const entryTimeJST = DateTime.fromFormat(entry.dt_txt, "yyyy-MM-dd HH:mm:ss", { zone: 'utc' }).setZone('Asia/Tokyo');
     const entryDate = entryTimeJST.toISODate(); // JSTベースの日付
     if (entryDate !== today) continue;
@@ -51,7 +51,7 @@ async function shouldBringUmbrella(): Promise<string> {
     return "☀️ 今日の予報では雨はなさそうです。傘はいりません！";
   }
 
-  return `☂️ 今日の降水予報があります。\n${rainHours.join("、")} に雨の可能性があります。\n傘を持って行きましょう。`;
+  return `☂️ 今日の降水予報があります。\n${rainHours.join("、")} 時点で雨が降っている可能性があります。(3時間ごとに計測しています。）\n傘を持って行きましょう！`;
 }
 
 async function notifyWeather() {
