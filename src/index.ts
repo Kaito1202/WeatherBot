@@ -14,11 +14,11 @@ const lineClient = new Client({
 const userId = process.env.USER_ID!;
 const city = process.env.CITY!;
 const weatherApiKey = process.env.OPENWEATHER_API_KEY!;
-const weatherJPMap: Record<string, string> = {
-  "Rain": "雨",
-  "Drizzle": "霧雨",
-  "Thunderstorm": "雷雨"
-};
+//const weatherJPMap: Record<string, string> = {
+//  "Rain": "雨",
+//  "Drizzle": "霧雨",
+//  "Thunderstorm": "雷雨"
+//};
 
 async function shouldBringUmbrella(): Promise<string> {
   const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city},jp&appid=${weatherApiKey}&units=metric&lang=ja`;
@@ -42,8 +42,9 @@ async function shouldBringUmbrella(): Promise<string> {
     const main = entry.weather[0].main;
     if (["Rain", "Drizzle", "Thunderstorm"].includes(main)) {
       const hour = entryTimeJST.hour;
-      const jpMain = weatherJPMap[main] || main;
-      rainHours.push(`${hour}時（${jpMain}）`);
+      //const jpMain = weatherJPMap[main] || main;
+      //rainHours.push(`${hour}時（${jpMain}）`);
+      rainHours.push(`${hour}時`);
     }
   }
 
