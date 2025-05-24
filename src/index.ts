@@ -23,6 +23,7 @@ const weatherJPMap: Record<string, string> = {
 async function shouldBringUmbrella(): Promise<string> {
   const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city},jp&appid=${weatherApiKey}&units=metric&lang=ja`;
   const res = await axios.get(url);
+  console.log(JSON.stringify(res.data, null, 2));
   const list = res.data.list;
 
   // 現在時刻を JST に
