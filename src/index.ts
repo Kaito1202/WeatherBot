@@ -13,6 +13,11 @@ const lineClient = new Client({
 const userId = process.env.USER_ID!;
 const city = process.env.CITY!;
 const weatherApiKey = process.env.OPENWEATHER_API_KEY!;
+const weatherJPMap: Record<string, string> = {
+  "Rain": "雨",
+  "Drizzle": "霧雨",
+  "Thunderstorm": "雷雨"
+};
 
 async function shouldBringUmbrella(): Promise<string> {
   const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city},jp&appid=${weatherApiKey}&units=metric&lang=ja`;
@@ -20,18 +25,23 @@ async function shouldBringUmbrella(): Promise<string> {
   const list = res.data.list;
   const now = new Date();
   const today = now.toISOString().slice(0,10)
-  const todayForcases = list.filter((entry:any)=>{
-    return entry.dt_txt.startsWith(today);
-  });
-  
-  const willRain = todayForcases.some((entry:any)=>{
-    const main = entry.weather[0].main;
-    return main === "Rain" || main === "Drizzle" || main === "Thunderstorm" || main === "Snow" ;
-  });
+  const rainHours: string[]=[];
 
-  return willRain
-    ? "☂️ 今日のどこかで雨の予報があります。傘を持って行こう！"
-    : "☀️ 今日の予報では雨はなさそうです。傘はいりません！";
+  for(const entry of list){
+    if(!entry.dt_txt.startsWith(today)) continue;
+    const main = entry.weather[0].main;
+    if(["Rain","Drizzle","Thunderstorm"].includes(main)){
+        const hour = new Date(entry.dt_txt).getHours();
+        const jpMain = weatherJPMap[main] || main;
+        rainHours.push(`${hour}時(${jpMain})`);
+        }
+  }
+
+
+  if(rainHours.length===0){
+    return "☀️ 今日の予報では雨はなさそうです。傘はいりません！";
+  }
+  return `☂️ 今日の降水予報があります。\n${rainHours.join("、")} に雨の可能性があります。\n傘を持って行きましょう。`;
 }
 
 async function notifyWeather() {
