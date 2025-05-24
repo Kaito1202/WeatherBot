@@ -17,17 +17,16 @@ const weatherApiKey = process.env.OPENWEATHER_API_KEY!;
 async function shouldBringUmbrella(): Promise<string> {
   const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city},jp&appid=${weatherApiKey}&units=metric&lang=ja`;
   const res = await axios.get(url);
-  console.log(JSON.stringify(res.data, null, 2));
   const list = res.data.list;
   const now = new Date();
   const today = now.toISOString().slice(0,10)
-
   const todayForcases = list.filter((entry:any)=>{
     return entry.dt_txt.startsWith(today);
   });
   
   const willRain = todayForcases.some((entry:any)=>{
-    entry.weather[0].main === "Rain"
+    const main = entry.weather[0].main;
+    return main === "Rain" || main === "Drizzle" || main === "Thunderstorm" || main === "Snow" ;
   });
 
   return willRain
