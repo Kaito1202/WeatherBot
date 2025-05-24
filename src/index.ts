@@ -35,7 +35,7 @@ async function shouldBringUmbrella(): Promise<string> {
 
   for (const entry of list) {
     // entry.dt_txt は UTC なので、JST に変換する
-    const entryTimeJST = DateTime.fromISO(entry.dt_txt, { zone: 'utc' }).setZone('Asia/Tokyo');
+    const entryTimeJST = DateTime.fromFormat(entry.dt_txt, { zone: 'utc' }).setZone('Asia/Tokyo');
     console.log(entryTimeJST);
     const entryDate = entryTimeJST.toISODate(); // JSTベースの日付
     console.log(entryDate);
