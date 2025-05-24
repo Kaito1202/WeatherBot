@@ -15,7 +15,7 @@ const city = process.env.CITY!;
 const weatherApiKey = process.env.OPENWEATHER_API_KEY!;
 
 async function shouldBringUmbrella(): Promise<string> {
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${weatherApiKey}&units=metric&lang=ja`;
+  const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city},jp&appid=${apiKey}&units=metric&lang=ja`;
   const res = await axios.get(url);
   console.log(JSON.stringify(res.data, null, 2));
   const list = res.data.list;
