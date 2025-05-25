@@ -1,7 +1,8 @@
 import express from 'express';
 import { middleware, Client } from '@line/bot-sdk';
 import dotenv from 'dotenv';
-import { shouldBringUmbrella } from './weather'; // ← 既存の関数を使う
+import { shouldBringUmbrella } from './weather';
+import type { Request, Response } from 'express';
 
 dotenv.config();
 
@@ -15,14 +16,21 @@ const config = {
 
 const client = new Client(config);
 
-app.post('/webhook', middleware(config), async (req, res) => {
+// ✅ 簡易確認用ルート
+app.get('/', (req, res) => {
+  res.send('Webhook server is running.');
+});
+
+// ✅ Webhookエンドポイント
+app.post('/webhook', middleware(config), async (req: Request, res: Response) => {
+  console.log("✅ Webhook受信:", JSON.stringify(req.body, null, 2));
+
   const events = req.body.events;
 
   for (const event of events) {
     if (event.type === 'message' && event.message.type === 'text') {
       const text = event.message.text.trim();
 
-      // 「傘いる？」と聞かれたら
       if (text.includes("傘")) {
         const replyToken = event.replyToken;
         try {
@@ -34,7 +42,7 @@ app.post('/webhook', middleware(config), async (req, res) => {
         } catch (err) {
           await client.replyMessage(replyToken, {
             type: 'text',
-            text: "エラーが発生しました。しばらくしてもう一度お試しください。",
+            text: "エラーが発生しました。",
           });
         }
       }
@@ -45,5 +53,5 @@ app.post('/webhook', middleware(config), async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Webhookサーバ起動: http://localhost:${PORT}`);
+  console.log(`🚀 Webhookサーバ起動: http://localhost:${PORT}/webhook`);
 });
