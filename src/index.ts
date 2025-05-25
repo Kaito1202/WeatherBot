@@ -72,6 +72,8 @@ async function notifyWeather() {
 cron.schedule('30 7 * * *', () => {
   console.log('⏰ 定期通知実行中...');
   notifyWeather();
+},{
+    timezone: 'Asia/Tokyo' 
 });
 
 // ✅ デバッグ用にすぐ1回実行（開発中は便利）
