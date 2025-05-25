@@ -11,7 +11,7 @@ const lineClient = new Client({
   channelSecret: process.env.CHANNEL_SECRET!,
 });
 
-const userId = process.env.USER_ID!;
+// const userId = process.env.USER_ID!;
 const city = process.env.CITY!;
 const weatherApiKey = process.env.OPENWEATHER_API_KEY!;
 //const weatherJPMap: Record<string, string> = {
@@ -58,13 +58,13 @@ async function shouldBringUmbrella(): Promise<string> {
 async function notifyWeather() {
   try {
     const message = await shouldBringUmbrella();
-    await lineClient.pushMessage(userId, {
+    await lineClient.broadcast({
       type: 'text',
       text: message,
     });
-    console.log(`[通知成功] ${new Date().toLocaleString()} に送信`);
+    console.log(`[ブロードキャスト成功] ${new Date().toLocaleString()} に送信`);
   } catch (err) {
-    console.error(`[通知失敗] ${new Date().toLocaleString()} -`, err);
+    console.error(`[ブロードキャスト失敗] ${new Date().toLocaleString()} -`, err);
   }
 }
 
