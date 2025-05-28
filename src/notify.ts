@@ -12,11 +12,10 @@ const lineClient = new Client({
 });
 
 // 毎朝7:30に通知
-cron.schedule('30 7 * * *', async () => {
-  console.log('⏰ 定期通知実行中...');
+cron.schedule('10 21 * * *', async () => {
   await notifyWeather();
 }, {
-  timezone: 'Asia/Tokyo'
+  timezone: 'Asia/Tokyo' // ✅ これがないとUTC時間で動きます（JSTより9時間遅れ）
 });
 
 // 開発中すぐにテスト実行
